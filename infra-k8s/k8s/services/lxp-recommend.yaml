@@ -1,26 +1,26 @@
-# lxp-content Application
+# lxp-recommend Application
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lxp-content
+  name: lxp-recommend
   namespace: lxp
   labels:
-    app: lxp-content
+    app: lxp-recommend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lxp-content
+      app: lxp-recommend
   template:
     metadata:
       labels:
-        app: lxp-content
+        app: lxp-recommend
     spec:
       imagePullSecrets:
         - name: dockerhub-secret
       containers:
-        - name: lxp-content
-          image: minyong96/lxp:lxp-content-latest
+        - name: lxp-recommend
+          image: minyong96/lxp:lxp-recommend-latest
           #          livenessProbe:
           #            httpGet:
           #              path: /actuator/health/liveness
@@ -50,7 +50,7 @@ spec:
                 -XX:MaxGCPauseMillis=200
             # MySQL (공용)
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://lxp-mysql:3306/lxp_content_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
+              value: "jdbc:mysql://lxp-mysql:3306/lxp_recommend_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -97,13 +97,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: lxp-content
+  name: lxp-recommend
   namespace: lxp
 spec:
   type: NodePort
   selector:
-    app: lxp-content
+    app: lxp-recommend
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30082
+      nodePort: 30083

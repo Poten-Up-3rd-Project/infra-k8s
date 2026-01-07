@@ -25,7 +25,7 @@ if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
     exit 1
 fi
 
-if [ -z "$RABBITMQ_PASS" ] || [ -z "$REDIS_PASS" ] || [ -z "$DB_PASS" ]; then
+if [ -z "$RABBITMQ_PASS" ] || [ -z "$REDIS_PASS" ] || [ -z "$MYSQL_PASS" ]; then
     echo -e "${RED}❌ 비밀번호를 .env에 설정해주세요${NC}"
     exit 1
 fi
@@ -62,27 +62,18 @@ kubectl create secret generic infra-secret \
 echo -e "${GREEN}✅ 인프라 secret 생성 완료${NC}"
 
 # ============================================
-# 3. 서비스별 DB Secret
+# 3. MySQL Secret (공용)
 # ============================================
-echo "🗄️ DB secret 생성..."
+echo "🗄️ MySQL secret 생성..."
 
-# lxp-user DB Secret
-kubectl create secret generic lxp-user-db-secret \
-    --from-literal=username="$DB_USER" \
-    --from-literal=password="$DB_PASS" \
-    --from-literal=root-password="$DB_ROOT_PASS" \
+kubectl create secret generic lxp-mysql-secret \
+    --from-literal=username="$MYSQL_USER" \
+    --from-literal=password="$MYSQL_PASS" \
+    --from-literal=root-password="$MYSQL_ROOT_PASS" \
     --namespace=lxp \
     --dry-run=client -o yaml | kubectl apply -f -
 
-# lxp-content DB Secret
-kubectl create secret generic lxp-content-db-secret \
-    --from-literal=username="$DB_USER" \
-    --from-literal=password="$DB_PASS" \
-    --from-literal=root-password="$DB_ROOT_PASS" \
-    --namespace=lxp \
-    --dry-run=client -o yaml | kubectl apply -f -
-
-echo -e "${GREEN}✅ DB secret 생성 완료${NC}"
+echo -e "${GREEN}✅ MySQL secret 생성 완료${NC}"
 echo ""
 
 # 확인

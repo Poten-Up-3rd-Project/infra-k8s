@@ -1,0 +1,92 @@
+# 공용 MySQL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lxp-mysql
+  namespace: lxp
+  labels:
+    app: lxp-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lxp-mysql
+  template:
+    metadata:
+      labels:
+        app: lxp-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-mysql-secret
+                  key: root-password
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: lxp-mysql-pvc
+        - name: init-scripts
+          configMap:
+            name: lxp-mysql-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lxp-mysql
+  namespace: lxp
+spec:
+  selector:
+    app: lxp-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lxp-mysql-pvc
+  namespace: lxp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# 초기화 스크립트 (스키마 + 유저 생성)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lxp-mysql-init
+  namespace: lxp
+data:
+  init.sql: |
+    -- 스키마 생성
+    CREATE DATABASE IF NOT EXISTS lxp_content_dev;
+    CREATE DATABASE IF NOT EXISTS lxp_recommend_dev;
+    CREATE DATABASE IF NOT EXISTS lxp_user_dev;
+    
+    -- 공용 유저 생성
+    CREATE USER IF NOT EXISTS 'lxp'@'%' IDENTIFIED BY 'lxppassword';
+    GRANT ALL PRIVILEGES ON lxp_content_dev.* TO 'lxp'@'%';
+    GRANT ALL PRIVILEGES ON lxp_recommend_dev.* TO 'lxp'@'%';
+    GRANT ALL PRIVILEGES ON lxp_user_dev.* TO 'lxp'@'%';
+    FLUSH PRIVILEGES;

@@ -4,15 +4,22 @@ metadata:
   name: lxp-ingress
   namespace: lxp
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
-    - host: content.lxp.local
+    - host: api.lxp.local
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /recommend(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: lxp-recommend
+                port:
+                  number: 8080
+          - path: /content(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: lxp-content

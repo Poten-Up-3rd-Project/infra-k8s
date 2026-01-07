@@ -31,6 +31,14 @@ MSA 서비스 간 통신 테스트를 위한 개발 환경입니다.
 ### 
 env파일은 제가 직접 전달해드릴게요!
 
+
+### ⚠️ Windows 사용자 주의
+
+`.env` 파일 만들 때 **LF 형식**으로 저장하세요!
+
+VSCode: 오른쪽 하단 `CRLF` → `LF` 변경 후 저장
+
+
 ### 1. 사전 요구사항 설치
 
 | 도구 | 설치 링크 |
@@ -91,11 +99,12 @@ minikube service rabbitmq -n lxp --url
 
 ### 포트 정리
 
-| 서비스 | NodePort | 용도 |
-|--------|----------|------|
-| lxp-user | 30081 | User 서비스 |
-| lxp-content | 30082 | Content 서비스 |
-| rabbitmq | 30672 | RabbitMQ UI |
+| 서비스           | NodePort | 용도            |
+|---------------|----------|---------------|
+| lxp-user      | 30081    | User 서비스      |
+| lxp-content   | 30082    | Content 서비스   |
+| lxp-recommend | 30683    | Recommend 서비스 |    
+| rabbitmq      | 30672    | RabbitMQ UI   |
 
 ## 📋 자주 쓰는 명령어
 
