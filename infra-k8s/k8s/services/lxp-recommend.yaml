@@ -21,20 +21,19 @@ spec:
       containers:
         - name: lxp-recommend
           image: minyong96/lxp:lxp-recommend-latest
-          #          livenessProbe:
-          #            httpGet:
-          #              path: /actuator/health/liveness
-          #              port: 8080
-          #            initialDelaySeconds: 90
-          #            periodSeconds: 10
-          #            failureThreshold: 3
-          #          readinessProbe:
-          #            httpGet:
-          #              path: /actuator/health/readiness
-          #              port: 8080
-          #            initialDelaySeconds: 60
-          #            periodSeconds: 5
-          #            failureThreshold: 3
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 5
           ports:
             - containerPort: 8080
           env:
