@@ -45,6 +45,16 @@ spec:
                 secretKeyRef:
                   name: lxp-mysql-secret
                   key: root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-mysql-secret
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-mysql-secret
+                  key: password
           resources:
             requests:
               memory: "256Mi"
@@ -89,7 +99,7 @@ spec:
     requests:
       storage: 5Gi
 ---
-# 초기화 스크립트 (스키마 + 유저 생성)
+# 초기화 스크립트 (스키마 + 권한 부여)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -103,10 +113,9 @@ data:
     CREATE DATABASE IF NOT EXISTS lxp_user_dev;
     CREATE DATABASE IF NOT EXISTS lxp_enrollment_dev;
     
-    -- 공용 유저 생성
-    CREATE USER IF NOT EXISTS 'lxp'@'%' IDENTIFIED BY 'lxppassword';
+    -- lxp 유저에게 권한 부여 (유저는 MYSQL_USER 환경변수로 자동 생성됨)
     GRANT ALL PRIVILEGES ON lxp_content_dev.* TO 'lxp'@'%';
     GRANT ALL PRIVILEGES ON lxp_recommend_dev.* TO 'lxp'@'%';
     GRANT ALL PRIVILEGES ON lxp_user_dev.* TO 'lxp'@'%';
-    GRANT ALL PRIVILEGES ON lxp_enrollemnt_dev.* TO 'lxp'@'%';
+    GRANT ALL PRIVILEGES ON lxp_enrollment_dev.* TO 'lxp'@'%';
     FLUSH PRIVILEGES;
