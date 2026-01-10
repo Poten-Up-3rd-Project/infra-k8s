@@ -18,23 +18,13 @@ spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:3.13-management
-          livenessProbe:
-            exec:
-              command:
-                - rabbitmq-diagnostics
-                - -q
-                - ping
-            initialDelaySeconds: 120
-            periodSeconds: 30
           readinessProbe:
-            exec:
-              command:
-                - rabbitmq-diagnostics
-                - -q
-                - check_running
-            initialDelaySeconds: 60
+            httpGet:
+              path: /api/healthchecks/node
+              port: 15672
+            initialDelaySeconds: 120
             periodSeconds: 10
-            timeoutSeconds: 10
+            timeoutSeconds: 5
           ports:
             - containerPort: 5672
               name: amqp
