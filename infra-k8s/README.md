@@ -99,12 +99,13 @@ minikube service rabbitmq -n lxp --url
 
 ### 포트 정리
 
-| 서비스           | NodePort | 용도            |
-|---------------|----------|---------------|
-| lxp-user      | 30081    | User 서비스      |
-| lxp-content   | 30082    | Content 서비스   |
-| lxp-recommend | 30683    | Recommend 서비스 |    
-| rabbitmq      | 30672    | RabbitMQ UI   |
+| 서비스            | NodePort | 용도             |
+|----------------|----------|----------------|
+| lxp-user       | 30081    | User 서비스       |
+| lxp-content    | 30082    | Content 서비스    |
+| lxp-recommend  | 30083    | Recommend 서비스  |    
+| lxp-enrollment | 30684    | Enrollment 서비스 |    
+| rabbitmq       | 30672    | RabbitMQ UI    |
 
 ## 📋 자주 쓰는 명령어
 

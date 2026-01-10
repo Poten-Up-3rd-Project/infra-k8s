@@ -101,10 +101,12 @@ data:
     CREATE DATABASE IF NOT EXISTS lxp_content_dev;
     CREATE DATABASE IF NOT EXISTS lxp_recommend_dev;
     CREATE DATABASE IF NOT EXISTS lxp_user_dev;
+    CREATE DATABASE IF NOT EXISTS lxp_enrollment_dev;
     
     -- 공용 유저 생성
     CREATE USER IF NOT EXISTS 'lxp'@'%' IDENTIFIED BY 'lxppassword';
     GRANT ALL PRIVILEGES ON lxp_content_dev.* TO 'lxp'@'%';
     GRANT ALL PRIVILEGES ON lxp_recommend_dev.* TO 'lxp'@'%';
     GRANT ALL PRIVILEGES ON lxp_user_dev.* TO 'lxp'@'%';
+    GRANT ALL PRIVILEGES ON lxp_enrollemnt_dev.* TO 'lxp'@'%';
     FLUSH PRIVILEGES;
