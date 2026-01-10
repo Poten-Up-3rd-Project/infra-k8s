@@ -18,13 +18,14 @@ spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:3.13-management
-          readinessProbe:
-            httpGet:
-              path: /api/healthchecks/node
-              port: 15672
-            initialDelaySeconds: 120
+          livenessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
+
           ports:
             - containerPort: 5672
               name: amqp

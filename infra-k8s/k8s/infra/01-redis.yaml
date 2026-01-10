@@ -19,19 +19,13 @@ spec:
         - name: redis
           image: redis:7-alpine
           livenessProbe:
-            exec:
-              command:
-                - redis-cli
-                - ping
+            tcpSocket:
+              port: 6379
             initialDelaySeconds: 30
             periodSeconds: 10
-          readinessProbe:
-            exec:
-              command:
-                - redis-cli
-                - ping
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
+
           command:
             - redis-server
             - --requirepass
