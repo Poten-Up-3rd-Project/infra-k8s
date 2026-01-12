@@ -25,7 +25,16 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 6
-
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
           command:
             - redis-server
             - --requirepass

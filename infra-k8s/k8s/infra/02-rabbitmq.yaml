@@ -18,6 +18,7 @@ spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:3.13-management
+
           livenessProbe:
             tcpSocket:
               port: 5672
@@ -25,6 +26,15 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - check_running
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
 
           ports:
             - containerPort: 5672
