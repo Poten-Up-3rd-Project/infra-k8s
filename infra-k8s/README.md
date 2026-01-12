@@ -104,7 +104,8 @@ minikube service rabbitmq -n lxp --url
 | lxp-user       | 30081    | User 서비스       |
 | lxp-content    | 30082    | Content 서비스    |
 | lxp-recommend  | 30083    | Recommend 서비스  |    
-| lxp-enrollment | 30684    | Enrollment 서비스 |    
+| lxp-enrollment | 30084    | Enrollment 서비스 |    
+| lxp-auth       | 30085    | Auth 서비스       |    
 | rabbitmq       | 30672    | RabbitMQ UI    |
 
 ## 📋 자주 쓰는 명령어

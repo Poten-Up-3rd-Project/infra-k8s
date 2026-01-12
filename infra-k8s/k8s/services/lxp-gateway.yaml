@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lxp-gateway
+  namespace: lxp
+  labels:
+    app: lxp-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lxp-gateway
+  template:
+    metadata:
+      labels:
+        app: lxp-gateway
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
+      containers:
+        - name: lxp-gateway
+          image: minyong96/lxp:lxp-gateway-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "dev"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lxp-gateway
+  namespace: lxp
+spec:
+  type: NodePort
+  selector:
+    app: lxp-gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
