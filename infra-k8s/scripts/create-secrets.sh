@@ -61,6 +61,16 @@ kubectl create secret generic infra-secret \
 
 echo -e "${GREEN}✅ 인프라 secret 생성 완료${NC}"
 
+
+echo "📦 Redis init script ConfigMap 생성..."
+
+kubectl create configmap redis-init \
+    --from-file=init-tags.redis=k8s/infra/init-scripts/init-tags.redis \
+    --namespace=lxp \
+    --dry-run=client -o yaml | kubectl apply -f -
+
+echo -e "${GREEN}✅ ConfigMap 생성 완료${NC}"
+
 # ============================================
 # 3. MySQL Secret (공용)
 # ============================================
