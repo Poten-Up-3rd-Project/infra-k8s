@@ -70,7 +70,7 @@ kubectl wait --for=condition=ready pod -l app=lxp-mysql -n lxp --timeout=180s ||
 # 7. 서비스(dev) 기동
 ######################################
 echo "🚀 LXP 서비스(dev) 기동"
-kubectl apply -f k8s/service/dev/
+kubectl apply -f k8s/services/stag/
 
 ######################################
 # 8. 상태 출력
