@@ -22,18 +22,18 @@ spec:
         - name: lxp-user
           image: minyong96/lxp:lxp-user-latest
           imagePullPolicy: Always
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 100
-            periodSeconds: 5
+#          livenessProbe:
+#            httpGet:
+#              path: /actuator/health/liveness
+#              port: 8080
+#            initialDelaySeconds: 120
+#            periodSeconds: 10
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health/readiness
+#              port: 8080
+#            initialDelaySeconds: 100
+#            periodSeconds: 5
           ports:
             - containerPort: 8080
           env:
