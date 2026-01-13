@@ -40,6 +40,18 @@ kubectl wait --namespace ingress-nginx \
 echo "📁 Namespace 생성"
 kubectl apply -f k8s/infra/00-namespace.yaml
 
+
+echo "🔐 Secret 생성"
+./scripts/create-secrets.sh
+
+######################################
+# 6. PVC 생성 (있다면 명시적으로)
+######################################
+echo "💾 PVC 생성"
+kubectl apply -f k8s/infra/pvc/
+
+
+
 ######################################
 # 5. Infra 서비스 기동
 ######################################
