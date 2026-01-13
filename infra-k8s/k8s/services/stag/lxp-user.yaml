@@ -42,6 +42,11 @@ spec:
                 secretKeyRef:
                   name: lxp-passport-keys
                   key: PASSPORT_PUBLIC_KEY
+            - name: INTERNAL_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-auth-secret
+                  key: INTERNAL_AUTH_TOKEN
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
             - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
