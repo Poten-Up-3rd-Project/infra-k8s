@@ -99,14 +99,16 @@ minikube service rabbitmq -n lxp --url
 
 ### 포트 정리
 
-| 서비스            | NodePort | 용도             |
-|----------------|----------|----------------|
-| lxp-user       | 30081    | User 서비스       |
-| lxp-content    | 30082    | Content 서비스    |
-| lxp-recommend  | 30083    | Recommend 서비스  |    
-| lxp-enrollment | 30084    | Enrollment 서비스 |    
-| lxp-auth       | 30085    | Auth 서비스       |    
-| rabbitmq       | 30672    | RabbitMQ UI    |
+| 서비스            | NodePort | 용도                   |
+|----------------|----------|----------------------|
+| lxp-user       | 30081    | User 서비스             |
+| lxp-content    | 30082    | Content 서비스          |
+| lxp-recommend  | 30083    | Recommend 서비스        |    
+| lxp-enrollment | 30084    | Enrollment 서비스       |    
+| lxp-auth       | 30085    | Auth 서비스             |    
+| lxp-gateway    | 30080    | gateway 서비스(ingress) |  
+| rabbitmq       | 30672    | RabbitMQ UI          |
+| rabbitmq       | 30572    | RabbitMQ AMQP         |
 
 ## 📋 자주 쓰는 명령어
 
@@ -212,5 +214,18 @@ infra-k8s/
 3. 팀원이 ./scripts/update-images.sh 실행
 4. 최신 이미지로 Pod 재시작
 ```
+
+# stag 환경 (Docker Hub 이미지) - 기본
+./scripts/local-setup.sh
+
+# 또는 명시적으로
+./scripts/local-setup.sh stag
+
+# dev 환경 (로컬 이미지) - 먼저 빌드 필요
+./scripts/local-setup.sh dev
+
+# 특정 서비스만 로컬 이미지로 교체
+./scripts/build-local.sh lxp-content ../lxp-content
+
 
 

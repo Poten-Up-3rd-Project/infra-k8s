@@ -13,18 +13,18 @@ if [ -n "$1" ]; then
     kubectl rollout status deployment/$1 -n lxp
 else
     # 전체 서비스 (인프라 제외)
-    DEPLOYMENTS=$(kubectl get deployments -n lxp -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep -v -E '^(redis|rabbitmq|.*-mysql)$' || true)
-    
+    DEPLOYMENTS=$(kubectl get deployments -n lxp -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep -v -E '^(redis|rabbitmq|lxp-mysql)$' || true)
+
     if [ -z "$DEPLOYMENTS" ]; then
         echo "업데이트할 서비스가 없습니다"
         exit 0
     fi
-    
+
     for DEPLOY in $DEPLOYMENTS; do
         echo "📦 $DEPLOY 재시작..."
         kubectl rollout restart deployment/$DEPLOY -n lxp
     done
-    
+
     for DEPLOY in $DEPLOYMENTS; do
         kubectl rollout status deployment/$DEPLOY -n lxp
     done
