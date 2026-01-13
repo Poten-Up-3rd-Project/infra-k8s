@@ -56,12 +56,13 @@ spec:
               value: "dev"
             - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
               value: "-1"
-#            - name: JAVA_TOOL_OPTIONS
-#              value: >
-#                -XX:MaxRAMPercentage=75.0
-#                -XX:InitialRAMPercentage=50.0
-#                -XX:+UseG1GC
-#                -XX:MaxGCPauseMillis=200
+            - name: JAVA_TOOL_OPTIONS
+              value: >
+                -Xms512m
+                -Xmx1024m
+                -XX:MaxMetaspaceSize=256m
+                -XX:+UseG1GC
+                -XX:MaxGCPauseMillis=200
             # MySQL (공용)
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:mysql://lxp-mysql:3306/lxp_auth_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
@@ -100,13 +101,13 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
-#          resources:
-#            requests:
-#              memory: "512Mi"
-#              cpu: "500m"
-#            limits:
-#              memory: "2Gi"
-#              cpu: "1000m"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
 ---
 apiVersion: v1
 kind: Service
