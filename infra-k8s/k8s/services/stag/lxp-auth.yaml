@@ -22,21 +22,26 @@ spec:
         - name: lxp-auth
           image: minyong96/lxp:lxp-auth-latest
           imagePullPolicy: Always
-#          livenessProbe:
-#            httpGet:
-#              path: /actuator/health/liveness
-#              port: 8080
-#            initialDelaySeconds: 120
-#            periodSeconds: 10
-#          readinessProbe:
-#            httpGet:
-#              path: /actuator/health/readiness
-#              port: 8080
-#            initialDelaySeconds: 100
-#            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 100
+            periodSeconds: 5
           ports:
             - containerPort: 8080
           env:
+            - name: PASSPORT_KEY_PUBLIC_KEY_STRING
+              valueFrom:
+                secretKeyRef:
+                    name: lxp-passport-keys
+                    key: PASSPORT_PUBLIC_KEY
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
             - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
