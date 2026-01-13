@@ -89,18 +89,7 @@ spec:
       targetPort: 3306
       nodePort: 30306
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: lxp-mysql-pvc
-  namespace: lxp
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
+
 # 초기화 스크립트 (스키마 + 권한 부여)
 apiVersion: v1
 kind: ConfigMap
