@@ -22,39 +22,46 @@ spec:
         - name: lxp-auth
           image: minyong96/lxp:lxp-auth-latest
           imagePullPolicy: Always
-          # 1. Probe 시간 상향 조정 (부팅이 느려도 기다려줌)
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 150
-            periodSeconds: 15
+            initialDelaySeconds: 120
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
-            initialDelaySeconds: 120
-            periodSeconds: 10
+            initialDelaySeconds: 100
+            periodSeconds: 5
           ports:
             - containerPort: 8080
           env:
             - name: PASSPORT_KEY_PUBLIC_KEY_STRING
               valueFrom:
                 secretKeyRef:
-                  name: lxp-passport-keys
-                  key: PASSPORT_PUBLIC_KEY
+                    name: lxp-passport-keys
+                    key: PASSPORT_PUBLIC_KEY
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-auth-secret
+                  key: JWT_SECRET_KEY
+            - name: INTERNAL_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                    name: lxp-auth-secret
+                    key: INTERNAL_AUTH_TOKEN
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
             - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
               value: "-1"
-            # 2. JVM 메모리 명시적 할당 (Percentage 대신 고정값 사용)
             - name: JAVA_TOOL_OPTIONS
               value: >
-                -Xms512M
-                -Xmx1024M
+                -XX:MaxRAMPercentage=75.0
+                -XX:InitialRAMPercentage=50.0
                 -XX:+UseG1GC
                 -XX:MaxGCPauseMillis=200
-                -Djava.security.egd=file:/dev/./urandom
             # MySQL (공용)
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:mysql://lxp-mysql:3306/lxp_auth_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
@@ -95,10 +102,10 @@ spec:
                   key: redis-password
           resources:
             requests:
-              memory: "768Mi"
+              memory: "512Mi"
               cpu: "500m"
             limits:
-              memory: "1.5Gi"
+              memory: "2Gi"
               cpu: "1000m"
 ---
 apiVersion: v1
