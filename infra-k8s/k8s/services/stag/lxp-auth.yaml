@@ -90,13 +90,13 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
+#          resources:
+#            requests:
+#              memory: "512Mi"
+#              cpu: "500m"
+#            limits:
+#              memory: "2Gi"
+#              cpu: "1000m"
 ---
 apiVersion: v1
 kind: Service
