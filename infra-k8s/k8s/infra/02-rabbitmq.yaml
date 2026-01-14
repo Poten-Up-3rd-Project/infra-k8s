@@ -65,7 +65,7 @@ spec:
       volumes:
         - name: rabbitmq-data
           persistentVolumeClaim:
-            claimName: rabbitmq-pvc
+            claimName: lxp-rabbitmq-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -86,14 +86,3 @@ spec:
       nodePort: 30672
       name: management
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: rabbitmq-pvc
-  namespace: lxp
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
