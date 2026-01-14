@@ -16,6 +16,7 @@ echo "  lxp-content:  http://localhost:8082"
 echo "  lxp-recommend: http://localhost:8083"
 echo "  lxp-enrollment: http://localhost:8084"
 echo "  lxp-auth:     http://localhost:8085"
+echo "  lxp-admin:     http://localhost:8086"
 echo ""
 echo "  RabbitMQ UI:  http://localhost:15672"
 echo "  MySQL:        localhost:3306"
@@ -31,6 +32,7 @@ kubectl port-forward service/lxp-content 8082:8080 -n lxp --address 0.0.0.0 &
 kubectl port-forward service/lxp-recommend 8083:8080 -n lxp --address 0.0.0.0 &
 kubectl port-forward service/lxp-enrollment 8084:8080 -n lxp --address 0.0.0.0 &
 kubectl port-forward service/lxp-auth 8085:8080 -n lxp --address 0.0.0.0 &
+kubectl port-forward service/lxp-admin 8086:8080 -n lxp --address 0.0.0.0 &
 
 # 인프라 포트포워딩
 kubectl port-forward service/lxp-mysql 3306:3306 -n lxp --address 0.0.0.0 &

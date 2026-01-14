@@ -1,0 +1,69 @@
+# lxp-admin Application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lxp-admin
+  namespace: lxp
+  labels:
+    app: lxp-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lxp-admin
+  template:
+    metadata:
+      labels:
+        app: lxp-admin
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
+      containers:
+        - name: lxp-admin
+          image: minyong96/lxp:lxp-admin-latest
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 5
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "dev"
+            - name: JAVA_TOOL_OPTIONS
+              value: >
+                -XX:MaxRAMPercentage=75.0
+                -XX:InitialRAMPercentage=50.0
+                -XX:+UseG1GC
+                -XX:MaxGCPauseMillis=200
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lxp-admin
+  namespace: lxp
+spec:
+  type: NodePort
+  selector:
+    app: lxp-admin
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30086
