@@ -37,6 +37,17 @@ spec:
                 secretKeyRef:
                   name: lxp-auth-secret
                   key: JWT_SECRET_KEY
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
+            - name: SPRING_DATA_REDIS_USERNAME
+              value: default
+            - name: SPRING_DATA_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secret
+                  key: redis-password
 
           resources:
             requests:

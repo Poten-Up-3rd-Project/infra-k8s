@@ -61,15 +61,16 @@ spec:
                   name: infra-secret
                   key: rabbitmq-password
             - name: SPRING_DATA_REDIS_HOST
-              value: "redis"
+              value: redis
             - name: SPRING_DATA_REDIS_PORT
               value: "6379"
+            - name: SPRING_DATA_REDIS_USERNAME
+              value: default
             - name: SPRING_DATA_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
-          resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
