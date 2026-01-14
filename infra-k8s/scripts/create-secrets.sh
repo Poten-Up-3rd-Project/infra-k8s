@@ -51,28 +51,39 @@ kubectl create secret generic lxp-mysql-secret \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # -------------------------------------------------
-# Passport Keys (⭐ 핵심)
+# Auth Keys (⭐ 비대칭키)
 # -------------------------------------------------
-echo "🔑 Passport key secrets 갱신..."
+echo "🔑 Auth key secrets 갱신..."
 
-PASSPORT_PUBLIC_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/passport-public.pem)
-PASSPORT_PRIVATE_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/passport-private.pem)
+AUTH_PUBLIC_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/auth-public.pem)
+AUTH_PRIVATE_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/auth-private.pem)
 
-kubectl create secret generic lxp-passport-keys \
-  --from-literal=PASSPORT_PUBLIC_KEY="$PASSPORT_PUBLIC_KEY" \
+kubectl create secret generic lxp-auth-keys \
+  --from-literal=AUTH_PUBLIC_KEY="$AUTH_PUBLIC_KEY" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl create secret generic lxp-passport-private-key \
-  --from-literal=PASSPORT_PRIVATE_KEY="$PASSPORT_PRIVATE_KEY" \
+kubectl create secret generic lxp-auth-private-key \
+  --from-literal=AUTH_PRIVATE_KEY="$AUTH_PRIVATE_KEY" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # -------------------------------------------------
-# Auth Secret
+# Passport Secret (⭐ 대칭키)
 # -------------------------------------------------
-kubectl create secret generic lxp-auth-secret \
-  --from-literal=JWT_SECRET_KEY="test-secret-key-for-unit-testing-purposes-only-minimum-32-characters-required" \
+echo "🔑 Passport secret 갱신..."
+
+PASSPORT_SECRET=$(cat k8s/infra/keys/passport-secret.txt)
+
+kubectl create secret generic lxp-passport-secret \
+  --from-literal=PASSPORT_SECRET="$PASSPORT_SECRET" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# -------------------------------------------------
+# Auth Secret (내부 토큰)
+# -------------------------------------------------
+kubectl create secret generic lxp-auth-internal \
   --from-literal=INTERNAL_AUTH_TOKEN="auth-service-internal-token" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -

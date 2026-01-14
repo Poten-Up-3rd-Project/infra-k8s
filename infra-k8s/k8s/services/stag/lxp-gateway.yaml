@@ -26,17 +26,16 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
-            - name: PASSPORT_KEY_PUBLIC_KEY_STRING
+            - name: AUTH_KEY_PUBLIC_KEY_STRING
               valueFrom:
                 secretKeyRef:
-                  name: lxp-passport-keys
-                  key: PASSPORT_PUBLIC_KEY
-
-            - name: JWT_SECRET_KEY
+                  name: lxp-auth-keys
+                  key: AUTH_PUBLIC_KEY
+            - name: PASSPORT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: lxp-auth-secret
-                  key: JWT_SECRET_KEY
+                  name: lxp-passport-secret
+                  key: PASSPORT_SECRET
             - name: SPRING_DATA_REDIS_HOST
               value: redis
             - name: SPRING_DATA_REDIS_PORT
