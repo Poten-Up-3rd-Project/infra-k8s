@@ -40,8 +40,13 @@ spec:
             - name: PASSPORT_KEY_PUBLIC_KEY_STRING
               valueFrom:
                 secretKeyRef:
-                    name: lxp-passport-keys
-                    key: PASSPORT_PUBLIC_KEY
+                  name: lxp-passport-keys
+                  key: PASSPORT_PUBLIC_KEY
+            - name: PASSPORT_KEY_PRIVATE_KEY_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-passport-private-key
+                  key: PASSPORT_PRIVATE_KEY
             - name: JWT_SECRET_KEY
               valueFrom:
                 secretKeyRef:

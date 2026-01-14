@@ -14,78 +14,68 @@ if [ -f .env ]; then
     echo -e "${GREEN}✅ .env 파일 로드 완료${NC}"
 else
     echo -e "${RED}❌ .env 파일이 없습니다!${NC}"
-    echo "   .env.example을 복사해서 .env 파일을 만들어주세요."
-    echo "   cp .env.example .env"
     exit 1
 fi
 
-# 필수 값 체크
-if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
-    echo -e "${RED}❌ DOCKERHUB_USERNAME, DOCKERHUB_TOKEN을 .env에 설정해주세요${NC}"
-    exit 1
-fi
-
-if [ -z "$RABBITMQ_PASS" ] || [ -z "$REDIS_PASS" ] || [ -z "$MYSQL_PASS" ]; then
-    echo -e "${RED}❌ 비밀번호를 .env에 설정해주세요${NC}"
-    exit 1
-fi
-
-# Namespace 생성
+# Namespace
 kubectl create namespace lxp --dry-run=client -o yaml | kubectl apply -f -
 
-# ============================================
-# 1. Docker Hub Secret
-# ============================================
-echo "📦 Docker Hub secret 생성..."
-
+# -------------------------------------------------
+# Docker Hub
+# -------------------------------------------------
 kubectl create secret docker-registry dockerhub-secret \
-    --docker-server=docker.io \
-    --docker-username="$DOCKERHUB_USERNAME" \
-    --docker-password="$DOCKERHUB_TOKEN" \
-    --namespace=lxp \
-    --dry-run=client -o yaml | kubectl apply -f -
+  --docker-server=docker.io \
+  --docker-username="$DOCKERHUB_USERNAME" \
+  --docker-password="$DOCKERHUB_TOKEN" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
 
-echo -e "${GREEN}✅ Docker Hub secret 생성 완료${NC}"
-
-# ============================================
-# 2. 인프라 Secret (RabbitMQ + Redis)
-# ============================================
-echo "🔧 인프라 secret 생성..."
-
+# -------------------------------------------------
+# Infra Secret
+# -------------------------------------------------
 kubectl create secret generic infra-secret \
-    --from-literal=rabbitmq-username="$RABBITMQ_USER" \
-    --from-literal=rabbitmq-password="$RABBITMQ_PASS" \
-    --from-literal=redis-password="$REDIS_PASS" \
-    --namespace=lxp \
-    --dry-run=client -o yaml | kubectl apply -f -
+  --from-literal=rabbitmq-username="$RABBITMQ_USER" \
+  --from-literal=rabbitmq-password="$RABBITMQ_PASS" \
+  --from-literal=redis-password="$REDIS_PASS" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
 
-echo -e "${GREEN}✅ 인프라 secret 생성 완료${NC}"
-
-
-echo "📦 Redis init script ConfigMap 생성..."
-
-kubectl create configmap redis-init \
-    --from-file=init-tags.redis=k8s/infra/init-scripts/init-tags.redis \
-    --namespace=lxp \
-    --dry-run=client -o yaml | kubectl apply -f -
-
-echo -e "${GREEN}✅ ConfigMap 생성 완료${NC}"
-
-# ============================================
-# 3. MySQL Secret (공용)
-# ============================================
-echo "🗄️ MySQL secret 생성..."
-
+# -------------------------------------------------
+# MySQL
+# -------------------------------------------------
 kubectl create secret generic lxp-mysql-secret \
-    --from-literal=username="$MYSQL_USER" \
-    --from-literal=password="$MYSQL_PASS" \
-    --from-literal=root-password="$MYSQL_ROOT_PASS" \
-    --namespace=lxp \
-    --dry-run=client -o yaml | kubectl apply -f -
+  --from-literal=username="$MYSQL_USER" \
+  --from-literal=password="$MYSQL_PASS" \
+  --from-literal=root-password="$MYSQL_ROOT_PASS" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
 
-echo -e "${GREEN}✅ MySQL secret 생성 완료${NC}"
-echo ""
+# -------------------------------------------------
+# Passport Keys (⭐ 핵심)
+# -------------------------------------------------
+echo "🔑 Passport key secrets 갱신..."
 
-# 확인
-echo "📋 생성된 Secret 목록:"
+PASSPORT_PUBLIC_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/passport-public.pem)
+PASSPORT_PRIVATE_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/passport-private.pem)
+
+kubectl create secret generic lxp-passport-keys \
+  --from-literal=PASSPORT_PUBLIC_KEY="$PASSPORT_PUBLIC_KEY" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl create secret generic lxp-passport-private-key \
+  --from-literal=PASSPORT_PRIVATE_KEY="$PASSPORT_PRIVATE_KEY" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# -------------------------------------------------
+# Auth Secret
+# -------------------------------------------------
+kubectl create secret generic lxp-auth-secret \
+  --from-literal=JWT_SECRET_KEY="test-secret-key-for-unit-testing-purposes-only-minimum-32-characters-required" \
+  --from-literal=INTERNAL_AUTH_TOKEN="auth-service-internal-token" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+echo -e "${GREEN}✅ 모든 Secret 생성/갱신 완료${NC}"
 kubectl get secrets -n lxp

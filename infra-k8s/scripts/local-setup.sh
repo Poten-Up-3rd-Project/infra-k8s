@@ -49,7 +49,13 @@ echo "🔐 Secret 설정..."
 ./scripts/create-secrets.sh
 echo ""
 
-# 5. 인프라 배포
+
+# 5 PVC 생성
+echo "💾 PVC 생성..."
+kubectl apply -f k8s/infra/pvc/
+echo ""
+
+# 5-1. 인프라 배포
 echo "🏗️ 인프라 배포..."
 kubectl apply -f k8s/infra/
 echo ""

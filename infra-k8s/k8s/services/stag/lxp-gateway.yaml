@@ -26,6 +26,18 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: PASSPORT_KEY_PUBLIC_KEY_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-passport-keys
+                  key: PASSPORT_PUBLIC_KEY
+
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-auth-secret
+                  key: JWT_SECRET_KEY
+
           resources:
             requests:
               memory: "256Mi"
