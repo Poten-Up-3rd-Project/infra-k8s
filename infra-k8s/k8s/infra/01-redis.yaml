@@ -91,11 +91,3 @@ spec:
     - port: 6379
       targetPort: 6379
       nodePort: 30379
----
-
-# 초기화 스크립트
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: lxp-redis-init
-  namespace: lxp
