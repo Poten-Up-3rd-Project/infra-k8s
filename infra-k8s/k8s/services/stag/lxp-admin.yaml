@@ -41,18 +41,20 @@ spec:
               value: "dev"
             - name: JAVA_TOOL_OPTIONS
               value: >
-                -XX:MaxRAMPercentage=75.0
-                -XX:InitialRAMPercentage=50.0
+                -XX:MaxRAMPercentage=70.0
+                -XX:InitialRAMPercentage=40.0
                 -XX:+UseG1GC
                 -XX:MaxGCPauseMillis=200
+                -XX:+ExitOnOutOfMemoryError
 
+          # 기본적으로 스프링 환경은 메모리 잡아먹는 양이 있으므로, 메모리를 너무 낮추면 안됨
           resources:
             requests:
               memory: "256Mi"
-              cpu: "100m"
+              cpu: "50m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu: "300m"
 ---
 apiVersion: v1
 kind: Service
