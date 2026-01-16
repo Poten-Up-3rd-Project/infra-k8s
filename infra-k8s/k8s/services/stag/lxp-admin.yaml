@@ -39,6 +39,17 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
+            - name: SPRING_DATA_REDIS_USERNAME
+              value: default
+            - name: SPRING_DATA_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secret
+                  key: redis-password
             - name: JAVA_TOOL_OPTIONS
               value: >
                 -XX:MaxRAMPercentage=70.0
