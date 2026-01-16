@@ -50,7 +50,13 @@ echo "🔐 Secret 생성"
 echo "💾 PVC 생성"
 kubectl apply -f k8s/infra/pvc/
 
-
+# 5-1. Redis init ConfigMap 생성 및 갱신
+echo "🧩 Redis init ConfigMap 생성/갱신..."
+kubectl create configmap lxp-redis-init \
+  -n lxp \
+  --from-file=init-tags.redis=k8s/infra/init-scripts/init-tags.redis \
+  --dry-run=client -o yaml | kubectl apply -f -
+echo ""
 
 ######################################
 # 5. Infra 서비스 기동

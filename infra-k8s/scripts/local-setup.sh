@@ -55,6 +55,7 @@ echo "💾 PVC 생성..."
 kubectl apply -f k8s/infra/pvc/
 echo ""
 
+# 5-1. Redis init ConfigMap 생성 및 갱신
 echo "🧩 Redis init ConfigMap 생성/갱신..."
 kubectl create configmap lxp-redis-init \
   -n lxp \
@@ -62,7 +63,7 @@ kubectl create configmap lxp-redis-init \
   --dry-run=client -o yaml | kubectl apply -f -
 echo ""
 
-# 5-1. 인프라 배포
+# 5-2. 인프라 배포
 echo "🏗️ 인프라 배포..."
 kubectl apply -f k8s/infra/
 echo ""
