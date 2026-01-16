@@ -49,8 +49,8 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: >
                 -Xms512m
-                -Xmx1024m
-                -XX:MaxMetaspaceSize=256m
+                -Xmx768m
+                -XX:MaxMetaspaceSize=192m
                 -XX:+UseG1GC
                 -XX:MaxGCPauseMillis=200
             # MySQL (공용)
@@ -95,10 +95,10 @@ spec:
                   key: redis-password
           resources:
             requests:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "100m"
             limits:
-              memory: "512Mi"
+              memory: "1Gi"
               cpu: "500m"
 ---
 apiVersion: v1
