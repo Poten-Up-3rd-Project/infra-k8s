@@ -55,8 +55,8 @@ kubectl create secret generic lxp-mysql-secret \
 # -------------------------------------------------
 echo "🔑 Auth key secrets 갱신..."
 
-AUTH_PUBLIC_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/auth-public.pem)
-AUTH_PRIVATE_KEY=$(awk '!/BEGIN|END/ { printf "%s", $0 }' k8s/infra/keys/auth-private.pem)
+AUTH_PUBLIC_KEY=$(grep -v '^-' k8s/infra/keys/auth-public.pem | tr -d '\n\r ')
+AUTH_PRIVATE_KEY=$(grep -v '^-' k8s/infra/keys/auth-private.pem | tr -d '\n\r ')
 
 kubectl create secret generic lxp-auth-keys \
   --from-literal=AUTH_PUBLIC_KEY="$AUTH_PUBLIC_KEY" \
@@ -73,13 +73,12 @@ kubectl create secret generic lxp-auth-private-key \
 # -------------------------------------------------
 echo "🔑 Passport secret 갱신..."
 
-PASSPORT_SECRET=$(cat k8s/infra/keys/passport-secret.txt)
+PASSPORT_SECRET=$(cat k8s/infra/keys/passport-secret.txt | tr -d '\n\r ')
 
 kubectl create secret generic lxp-passport-secret \
   --from-literal=PASSPORT_SECRET="$PASSPORT_SECRET" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -
-
 # -------------------------------------------------
 # Auth Secret (내부 토큰)
 # -------------------------------------------------

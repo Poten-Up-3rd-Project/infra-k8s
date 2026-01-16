@@ -71,6 +71,7 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
+          resources:
             requests:
               memory: "256Mi"
               cpu: "100m"

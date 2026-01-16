@@ -24,6 +24,11 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: PASSPORT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-passport-secret
+                  key: PASSPORT_SECRET
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:mysql://lxp-mysql:3306/lxp_content_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
             - name: SPRING_DATASOURCE_USERNAME
