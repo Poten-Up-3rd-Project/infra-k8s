@@ -18,43 +18,38 @@ spec:
       containers:
         - name: redis
           image: redis:7-alpine
-          # 1. ReadinessProbe 최적화: 초기 지연 시간을 줄여 더 빨리 감지
           readinessProbe:
             exec:
               command:
                 - sh
                 - -c
                 - "redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"
-            initialDelaySeconds: 2
+            initialDelaySeconds: 5
             periodSeconds: 5
           command:
             - sh
             - -c
             - |
-              # 2. 백그라운드 데이터 로딩 루프
-              # Redis가 완전히 뜰 때까지 대기 후, 파일이 있으면 데이터를 밀어넣습니다.
-              (
-                until redis-cli -a "$REDIS_PASSWORD" ping | grep PONG; do
-                  echo "Waiting for Redis for data loading..."
-                  sleep 1
-                done
+              # 1. Redis 서버를 백그라운드로 실행 (인증 및 모드 설정)
+              redis-server --requirepass "$REDIS_PASSWORD" --protected-mode no &
               
-                # 파일 경로 확인 로그 출력 (디버깅용)
-                echo "Checking for init file at /init/init-tags.redis"
-              
-                if [ -f /init/init-tags.redis ]; then
-                  echo "Init file found. Loading data..."
-                  redis-cli -a "$REDIS_PASSWORD" < /init/init-tags.redis
-                  echo "Data loading completed."
-                else
-                  echo "WARNING: /init/init-tags.redis not found. Directory content:"
-                  ls -R /init
-                fi
-              ) &
+              # 2. Redis가 구동될 때까지 최대 30초 대기
+              FOR_COUNT=0
+              until redis-cli -a "$REDIS_PASSWORD" ping | grep PONG || [ $FOR_COUNT -eq 15 ]; do
+                echo "Waiting for Redis to start..."
+                sleep 2
+                FOR_COUNT=$((FOR_COUNT + 1))
+              done
 
-              # 3. Redis 서버를 포그라운드(PID 1)로 실행
-              # exec를 사용해야 시그널 전달이 정확하고 구동 속도가 빠릅니다.
-              exec redis-server --requirepass "$REDIS_PASSWORD" --protected-mode no
+              # 3. 초기화 스크립트 실행 (파일이 존재할 경우만)
+              if [ -f /init/init-tags.redis ]; then
+                echo "Loading initial data..."
+                redis-cli -a "$REDIS_PASSWORD" < /init/init-tags.redis
+              fi
+
+              # 4. 백그라운드 프로세스를 포그라운드로 가져와 컨테이너 유지
+              echo "Redis is now ready and authenticated."
+              wait
           env:
             - name: REDIS_PASSWORD
               valueFrom:
@@ -82,6 +77,17 @@ spec:
         - name: init-scripts
           configMap:
             name: lxp-redis-init
-            items:
-              - key: "init-tags.redis"
-                path: "init-tags.redis"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: lxp
+spec:
+  type: NodePort
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+      nodePort: 30379
