@@ -1,53 +1,41 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lxp-auth
+  name: lxp-enrollment
   namespace: lxp
   labels:
-    app: lxp-auth
+    app: lxp-enrollment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lxp-auth
+      app: lxp-enrollment
   template:
     metadata:
       labels:
-        app: lxp-auth
+        app: lxp-enrollment
     spec:
       containers:
-        - name: lxp-auth
-          image: lxp-auth:local
-          imagePullPolicy: Never
+        - name: lxp-enrollment
+          image: lxp-enrollment:latest
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
-            - name: AUTH_KEY_PUBLIC_KEY_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: lxp-auth-keys
-                  key: AUTH_PUBLIC_KEY
-            - name: AUTH_KEY_PRIVATE_KEY_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: lxp-auth-private-key
-                  key: AUTH_PRIVATE_KEY
-
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+            - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
+              value: "-1"
+            # Auth
             - name: PASSPORT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: lxp-passport-secret
                   key: PASSPORT_SECRET
-
-            - name: INTERNAL_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: lxp-auth-internal
-                  key: INTERNAL_AUTH_TOKEN
+            # MySQL
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://lxp-mysql:3306/lxp_auth_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
+              value: "jdbc:mysql://lxp-mysql:3306/lxp_enrollment_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -58,6 +46,7 @@ spec:
                 secretKeyRef:
                   name: lxp-mysql-secret
                   key: password
+            # RabbitMQ
             - name: SPRING_RABBITMQ_HOST
               value: "rabbitmq"
             - name: SPRING_RABBITMQ_PORT
@@ -72,6 +61,7 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: rabbitmq-password
+            # Redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis
             - name: SPRING_DATA_REDIS_PORT
@@ -83,24 +73,40 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu: "400m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: lxp-auth
+  name: lxp-enrollment
   namespace: lxp
 spec:
   type: NodePort
   selector:
-    app: lxp-auth
+    app: lxp-enrollment
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30082
+      nodePort: 30084

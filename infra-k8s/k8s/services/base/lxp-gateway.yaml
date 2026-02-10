@@ -15,17 +15,17 @@ spec:
       labels:
         app: lxp-gateway
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: lxp-gateway
-          image: minyong96/lxp:lxp-gateway-latest
-          imagePullPolicy: Always
+          image: lxp-gateway:latest
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+            # Auth
             - name: AUTH_KEY_PUBLIC_KEY_STRING
               valueFrom:
                 secretKeyRef:
@@ -36,6 +36,7 @@ spec:
                 secretKeyRef:
                   name: lxp-passport-secret
                   key: PASSPORT_SECRET
+            # Redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis
             - name: SPRING_DATA_REDIS_PORT
@@ -47,14 +48,29 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
-
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu: "400m"
 ---
 apiVersion: v1
 kind: Service

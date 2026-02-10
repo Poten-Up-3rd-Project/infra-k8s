@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: lxp-gateway
+    newName: lxp-gateway
+    newTag: local
+  - name: lxp-admin
+    newName: lxp-admin
+    newTag: local
+  - name: lxp-auth
+    newName: lxp-auth
+    newTag: local
+  - name: lxp-user
+    newName: lxp-user
+    newTag: local
+  - name: lxp-content
+    newName: lxp-content
+    newTag: local
+  - name: lxp-enrollment
+    newName: lxp-enrollment
+    newTag: local
+  - name: lxp-recommend
+    newName: lxp-recommend
+    newTag: local
+
+patches:
+  - target:
+      kind: Deployment
+      namespace: lxp
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never

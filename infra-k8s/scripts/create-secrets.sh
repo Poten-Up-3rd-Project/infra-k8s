@@ -37,6 +37,8 @@ kubectl create secret generic infra-secret \
   --from-literal=rabbitmq-username="$RABBITMQ_USER" \
   --from-literal=rabbitmq-password="$RABBITMQ_PASS" \
   --from-literal=redis-password="$REDIS_PASS" \
+  --from-literal=minio-access-key="$MINIO_ACCESS_KEY" \
+  --from-literal=minio-secret-key="$MINIO_SECRET_KEY" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -
 

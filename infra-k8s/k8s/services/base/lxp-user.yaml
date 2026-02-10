@@ -1,61 +1,46 @@
-# lxp-recommend Application
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lxp-recommend
+  name: lxp-user
   namespace: lxp
   labels:
-    app: lxp-recommend
+    app: lxp-user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: lxp-recommend
+      app: lxp-user
   template:
     metadata:
       labels:
-        app: lxp-recommend
+        app: lxp-user
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
-        - name: lxp-recommend
-          image: minyong96/lxp:lxp-recommend-latest
-          imagePullPolicy: Always
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 5
+        - name: lxp-user
+          image: lxp-user:latest
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+            - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
+              value: "-1"
+            # Auth
             - name: PASSPORT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: lxp-passport-secret
                   key: PASSPORT_SECRET
-            - name: SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT
-              value: "-1"
-            - name: JAVA_TOOL_OPTIONS
-              value: >
-                -Xms512m
-                -Xmx768m
-                -XX:MaxMetaspaceSize=192m
-                -XX:+UseG1GC
-                -XX:MaxGCPauseMillis=200
-            # MySQL (공용)
+            - name: INTERNAL_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-auth-internal
+                  key: INTERNAL_AUTH_TOKEN
+            # MySQL
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://lxp-mysql:3306/lxp_recommend_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
+              value: "jdbc:mysql://lxp-mysql:3306/lxp_user_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -93,24 +78,40 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "800m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: lxp-recommend
+  name: lxp-user
   namespace: lxp
 spec:
   type: NodePort
   selector:
-    app: lxp-recommend
+    app: lxp-user
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30083
+      nodePort: 30081

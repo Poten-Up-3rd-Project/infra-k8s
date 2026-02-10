@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: lxp-gateway
+    newName: minyong96/lxp
+    newTag: lxp-gateway-latest
+  - name: lxp-admin
+    newName: minyong96/lxp
+    newTag: lxp-admin-latest
+  - name: lxp-auth
+    newName: minyong96/lxp
+    newTag: lxp-auth-latest
+  - name: lxp-user
+    newName: minyong96/lxp
+    newTag: lxp-user-latest
+  - name: lxp-content
+    newName: minyong96/lxp
+    newTag: lxp-content-latest
+  - name: lxp-enrollment
+    newName: minyong96/lxp
+    newTag: lxp-enrollment-latest
+  - name: lxp-recommend
+    newName: minyong96/lxp
+    newTag: lxp-recommend-latest
+
+patches:
+  - target:
+      kind: Deployment
+      namespace: lxp
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Always
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: dockerhub-secret

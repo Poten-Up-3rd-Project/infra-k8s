@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - lxp-gateway.yaml
+  - lxp-admin.yaml
+  - lxp-auth.yaml
+  - lxp-user.yaml
+  - lxp-content.yaml
+  - lxp-enrollment.yaml
+  - lxp-recommend.yaml

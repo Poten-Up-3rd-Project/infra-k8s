@@ -1,4 +1,3 @@
-# lxp-admin Application
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,29 +15,17 @@ spec:
       labels:
         app: lxp-admin
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: lxp-admin
-          image: minyong96/lxp:lxp-admin-latest
-          imagePullPolicy: Always
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 5
+          image: lxp-admin:latest
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ExitOnOutOfMemoryError"
+            # Redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis
             - name: SPRING_DATA_REDIS_PORT
@@ -50,22 +37,29 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: redis-password
-            - name: JAVA_TOOL_OPTIONS
-              value: >
-                -XX:MaxRAMPercentage=70.0
-                -XX:InitialRAMPercentage=40.0
-                -XX:+UseG1GC
-                -XX:MaxGCPauseMillis=200
-                -XX:+ExitOnOutOfMemoryError
-
-          # 기본적으로 스프링 환경은 메모리 잡아먹는 양이 있으므로, 메모리를 너무 낮추면 안됨
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
           resources:
             requests:
               memory: "256Mi"
-              cpu: "50m"
+              cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "300m"
+              cpu: "400m"
 ---
 apiVersion: v1
 kind: Service
