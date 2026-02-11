@@ -75,7 +75,7 @@ spec:
                   name: infra-secret
                   key: minio-secret-key
             # Cloudflare R2
-            - name: R2_ENDPOINT_URL
+            - name: R2_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: lxp-r2-secret
@@ -90,8 +90,14 @@ spec:
                 secretKeyRef:
                   name: lxp-r2-secret
                   key: r2-secret-access-key
-            - name: R2_BUCKET_NAME
+            - name: R2_ACCOUNT_ID
+              value: "3fc952fad0fea7d28e4f3875b2645ffb"
+            - name: R2_BUCKET
               value: "lxp"
+            - name: R2_REGION
+              value: "auto"
+            - name: R2_DEFAULT_TTL_SECONDS
+              value: "900"
             # Redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis
