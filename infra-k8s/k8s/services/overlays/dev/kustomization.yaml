@@ -26,6 +26,12 @@ images:
   - name: lxp-recommend
     newName: lxp-recommend
     newTag: local
+  - name: lxp-recomm-engine
+    newName: lxp-recomm-engine
+    newTag: local
+  - name: lxp-qna-engine
+    newName: lxp-qna-engine
+    newTag: local
 
 patches:
   - target:

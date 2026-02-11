@@ -74,6 +74,24 @@ spec:
                 secretKeyRef:
                   name: infra-secret
                   key: minio-secret-key
+            # Cloudflare R2
+            - name: R2_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-r2-secret
+                  key: r2-endpoint-url
+            - name: R2_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-r2-secret
+                  key: r2-access-key-id
+            - name: R2_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-r2-secret
+                  key: r2-secret-access-key
+            - name: R2_BUCKET_NAME
+              value: "lxp"
             # Redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis

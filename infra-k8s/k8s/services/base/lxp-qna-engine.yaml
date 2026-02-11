@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lxp-qna-engine
+  namespace: lxp
+  labels:
+    app: lxp-qna-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lxp-qna-engine
+  template:
+    metadata:
+      labels:
+        app: lxp-qna-engine
+    spec:
+      containers:
+        - name: lxp-qna-engine
+          image: lxp-qna-engine:latest
+          ports:
+            - containerPort: 8000
+          env:
+            # RabbitMQ
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secret
+                  key: rabbitmq-url
+            - name: RABBIT_EXCHANGE
+              value: "content.events"
+            - name: RABBIT_ROUTING_KEY
+              value: "qna.created"
+            - name: RABBIT_QUEUE
+              value: "lxp-qna-engine.qna-created"
+            # LLM
+            - name: GEMINI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-llm-secret
+                  key: gemini-key
+            - name: LANGSMITH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lxp-llm-secret
+                  key: langsmith-api-key
+            - name: MODEL
+              value: "gemini-3-flash-preview"
+            - name: MODEL_PROVIDER
+              value: "google-genai"
+            - name: LLM_TEMPERATURE
+              value: "0.2"
+            - name: LLM_MAX_TOKENS
+              value: "1024"
+            # Callback (lxp-content)
+            - name: QNA_CALLBACK_BASE
+              value: "http://lxp-content:8080/api-v1/qna"
+            - name: REQUEST_TIMEOUT_SECONDS
+              value: "30"
+            # Scheduler
+            - name: CRON_1
+              value: "0 12 * * *"
+            - name: CRON_2
+              value: "0 18 * * *"
+            - name: TIMEZONE
+              value: "Asia/Seoul"
+            - name: IMMEDIATE_PROCESS
+              value: "true"
+            # Service
+            - name: LOG_LEVEL
+              value: "INFO"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            failureThreshold: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "100m"
+            limits:
+              memory: "768Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lxp-qna-engine
+  namespace: lxp
+spec:
+  type: NodePort
+  selector:
+    app: lxp-qna-engine
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30091

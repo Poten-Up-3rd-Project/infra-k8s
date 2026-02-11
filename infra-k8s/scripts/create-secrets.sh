@@ -36,6 +36,7 @@ kubectl create secret docker-registry dockerhub-secret \
 kubectl create secret generic infra-secret \
   --from-literal=rabbitmq-username="$RABBITMQ_USER" \
   --from-literal=rabbitmq-password="$RABBITMQ_PASS" \
+  --from-literal=rabbitmq-url="amqp://$RABBITMQ_USER:$RABBITMQ_PASS@rabbitmq:5672/" \
   --from-literal=redis-password="$REDIS_PASS" \
   --from-literal=minio-access-key="$MINIO_ACCESS_KEY" \
   --from-literal=minio-secret-key="$MINIO_SECRET_KEY" \
@@ -49,6 +50,25 @@ kubectl create secret generic lxp-mysql-secret \
   --from-literal=username="$MYSQL_USER" \
   --from-literal=password="$MYSQL_PASS" \
   --from-literal=root-password="$MYSQL_ROOT_PASS" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# -------------------------------------------------
+# Cloudflare R2
+# -------------------------------------------------
+kubectl create secret generic lxp-r2-secret \
+  --from-literal=r2-endpoint-url="$R2_ENDPOINT_URL" \
+  --from-literal=r2-access-key-id="$R2_ACCESS_KEY_ID" \
+  --from-literal=r2-secret-access-key="$R2_SECRET_ACCESS_KEY" \
+  -n lxp \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# -------------------------------------------------
+# LLM (Gemini + LangSmith)
+# -------------------------------------------------
+kubectl create secret generic lxp-llm-secret \
+  --from-literal=gemini-key="$GEMINI_KEY" \
+  --from-literal=langsmith-api-key="$LANGSMITH_API_KEY" \
   -n lxp \
   --dry-run=client -o yaml | kubectl apply -f -
 

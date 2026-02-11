@@ -32,7 +32,7 @@ echo ""
 echo "minikube 확인..."
 if ! minikube status > /dev/null 2>&1; then
     echo "minikube 시작 중..."
-    minikube start --memory=4096 --cpus=2
+    minikube start --memory=6144 --cpus=2
 else
     echo -e "${GREEN}minikube 실행 중${NC}"
 fi
@@ -82,6 +82,7 @@ echo ""
 
 # 10. 상태 확인
 MINIKUBE_IP=$(minikube ip)
+DRIVER=$(minikube profile list -o json 2>/dev/null | grep -o '"Driver":"[^"]*"' | head -1 | cut -d'"' -f4)
 
 echo "=========================================="
 echo -e "${GREEN}배포 완료! (환경: $ENV)${NC}"
@@ -90,7 +91,7 @@ echo ""
 kubectl get pods -n lxp
 echo ""
 echo "=========================================="
-echo "서비스 접속:"
+echo "서비스 접속 (NodePort):"
 echo "=========================================="
 echo ""
 echo "API Gateway:    http://$MINIKUBE_IP:30080"
@@ -99,7 +100,9 @@ echo "lxp-content:    http://$MINIKUBE_IP:30082"
 echo "lxp-recommend:  http://$MINIKUBE_IP:30083"
 echo "lxp-enrollment: http://$MINIKUBE_IP:30084"
 echo "lxp-auth:       http://$MINIKUBE_IP:30085"
-echo "lxp-admin:      http://$MINIKUBE_IP:30086"
+echo "lxp-admin:         http://$MINIKUBE_IP:30086"
+echo "lxp-recomm-engine: http://$MINIKUBE_IP:30090"
+echo "lxp-qna-engine:    http://$MINIKUBE_IP:30091"
 echo ""
 echo "RabbitMQ UI:    http://$MINIKUBE_IP:30672"
 echo "MinIO API:      http://$MINIKUBE_IP:30900"
@@ -107,3 +110,28 @@ echo "MinIO Console:  http://$MINIKUBE_IP:30901"
 echo "MySQL:          $MINIKUBE_IP:30306"
 echo "Redis:          $MINIKUBE_IP:30379"
 echo ""
+
+if [ "$DRIVER" = "docker" ]; then
+    echo "=========================================="
+    echo -e "${YELLOW}Docker 드라이버 감지!${NC}"
+    echo "=========================================="
+    echo ""
+    echo "Windows 브라우저에서 접근하려면 포트포워딩이 필요합니다."
+    echo "Pod이 모두 Running 상태가 되면 새 터미널에서 실행:"
+    echo ""
+    echo -e "  ${GREEN}./scripts/port-forward.sh${NC}"
+    echo ""
+    echo "포트포워딩 후 접속 주소:"
+    echo "  Gateway:        http://localhost:8080"
+    echo "  lxp-user:       http://localhost:8081"
+    echo "  lxp-content:    http://localhost:8082"
+    echo "  lxp-recommend:  http://localhost:8083"
+    echo "  lxp-enrollment: http://localhost:8084"
+    echo "  lxp-auth:       http://localhost:8085"
+    echo "  lxp-admin:         http://localhost:8086"
+    echo "  lxp-recomm-engine: http://localhost:8090"
+    echo "  lxp-qna-engine:   http://localhost:8091"
+    echo "  RabbitMQ UI:      http://localhost:15672"
+    echo "  MinIO Console:  http://localhost:9001"
+    echo ""
+fi

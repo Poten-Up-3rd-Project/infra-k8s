@@ -8,3 +8,5 @@ resources:
   - lxp-content.yaml
   - lxp-enrollment.yaml
   - lxp-recommend.yaml
+  - lxp-recomm-engine.yaml
+  - lxp-qna-engine.yaml

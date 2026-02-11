@@ -54,7 +54,7 @@ git clone https://github.com/Poten-Up-3rd-Project/infra-k8s.git
 cd infra-k8s
 ```
 
-### 3. 스크립트 실행 권한 (Mac/Linux)
+### 3. 스크립트 실행 권한 (Mac/Linux/WSL)
 
 ```bash
 chmod +x scripts/*.sh
@@ -66,7 +66,6 @@ chmod +x scripts/*.sh
 ./scripts/local-setup.sh
 ```
 
-
 ### 5. 상태 확인
 
 ```bash
@@ -74,6 +73,29 @@ kubectl get pods -n lxp
 ```
 
 모든 Pod이 `Running` 상태면 성공!
+
+### 6. 포트포워딩 (WSL2 / Docker Desktop 사용 시 필수)
+
+Docker 드라이버를 사용하는 경우 `minikube ip`로 직접 접근이 불가능합니다.
+**새 터미널**을 열고 포트포워딩을 실행하세요:
+
+```bash
+./scripts/port-forward.sh
+```
+
+이후 Windows 브라우저에서 `localhost`로 접근 가능:
+
+| 서비스 | 포트포워딩 주소 |
+|--------|----------------|
+| Gateway | http://localhost:8080 |
+| lxp-user | http://localhost:8081 |
+| lxp-content | http://localhost:8082 |
+| lxp-recommend | http://localhost:8083 |
+| lxp-enrollment | http://localhost:8084 |
+| lxp-auth | http://localhost:8085 |
+| lxp-admin | http://localhost:8086 |
+| RabbitMQ UI | http://localhost:15672 |
+| MinIO Console | http://localhost:9001 |
 
 ## 🌐 서비스 접속
 

@@ -26,6 +26,12 @@ images:
   - name: lxp-recommend
     newName: minyong96/lxp
     newTag: lxp-recommend-latest
+  - name: lxp-recomm-engine
+    newName: minyong96/lxp
+    newTag: lxp-recomm-engine-latest
+  - name: lxp-qna-engine
+    newName: minyong96/lxp
+    newTag: lxp-qna-engine-latest
 
 patches:
   - target:
